@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'transition_row_data_container.dart';
-import 'transition_toggle_field_data_container.dart';
 
 class TransitionWindow extends StatefulWidget {
   final List<TransitionRowDataContainer> transitionRows;
@@ -108,7 +107,11 @@ class _TransitionWindowState extends State<TransitionWindow> {
         _dropdownField(
           value: data.fromState.initValue,
           options: data.fromState.options,
-          onChanged: data.fromState.onChanged,
+          onChanged: (value) {
+            setState(() {
+              data.fromState.initValue = value ?? "";
+            });
+          },
         ),
 
         Padding(
@@ -126,7 +129,11 @@ class _TransitionWindowState extends State<TransitionWindow> {
         _dropdownField(
           value: data.withInput.initValue,
           options: data.withInput.options,
-          onChanged: data.withInput.onChanged,
+          onChanged: (value) {
+            setState(() {
+              data.withInput.initValue = value ?? "";
+            });
+          },
         ),
 
         Padding(
@@ -144,7 +151,11 @@ class _TransitionWindowState extends State<TransitionWindow> {
         _dropdownField(
           value: data.toState.initValue,
           options: data.toState.options,
-          onChanged: data.toState.onChanged,
+          onChanged: (value) {
+            setState(() {
+              data.toState.initValue = value ?? "";
+            });
+          },
         ),
 
         Padding(
@@ -162,7 +173,11 @@ class _TransitionWindowState extends State<TransitionWindow> {
         _dropdownField(
           value: data.withOutput.initValue,
           options: data.withOutput.options,
-          onChanged: data.withOutput.onChanged,
+          onChanged: (value) {
+            setState(() {
+              data.withOutput.initValue = value ?? "";
+            });
+          },
         ),
 
         SizedBox(width: horizontalSpacing),

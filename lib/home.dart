@@ -23,7 +23,11 @@ class _HomeState extends State<Home> {
   List<String> _outputAlphabet = [];
   String _startState = "";
 
-  TransitionMap _map = TransitionMap();
+  TransitionMap _transitionMap = TransitionMap();
+
+  String _inputString = "";
+  String _outputString = "";
+  List<String> _visitedStates = [];
 
   void _updateToggleFieldInitValues() {
     _toggleFieldInitValues = TransitionRowDataContainer(
@@ -58,19 +62,35 @@ class _HomeState extends State<Home> {
           fromState: TransitionToggleFieldDataContainer(
               initValue: _toggleFieldInitValues!.fromState.initValue,
               options: _states,
-              onChanged: (val) {}),
+              onChanged: (val) {
+                setState(() {
+                  _transitionRows.last.fromState.initValue = val ?? "";
+                });
+              },),
           withInput: TransitionToggleFieldDataContainer(
               initValue: _toggleFieldInitValues!.withInput.initValue,
               options: _inputAlphabet,
-              onChanged: (val) {}),
+              onChanged: (val) {
+                setState(() {
+                  _transitionRows.last.withInput.initValue = val ?? "";
+                });
+              },),
           toState: TransitionToggleFieldDataContainer(
               initValue: _toggleFieldInitValues!.toState.initValue,
               options: _states,
-              onChanged: (val) {}),
+              onChanged: (val) {
+                setState(() {
+                  _transitionRows.last.toState.initValue = val ?? "";
+                });
+              },),
           withOutput: TransitionToggleFieldDataContainer(
               initValue: _toggleFieldInitValues!.withOutput.initValue,
               options: _outputAlphabet,
-              onChanged: (val) {}),
+              onChanged: (val) {
+                setState(() {
+                  _transitionRows.last.withOutput.initValue = val ?? "";
+                });
+              }),
         ),
       );
     });
@@ -129,9 +149,9 @@ class _HomeState extends State<Home> {
                 Row(
                   children: [
                     Expanded(
-                      child: _textContainer("States (Q):", "q1, q2, ...", (value) {
+                      child: _textContainer("States (Q):", "q0, q1, ...", (value) {
                         setState(() {
-                          _states = _appendInputToList(_states, value);
+                          _states = _appendInputToList(value);
                           _updateToggleFieldInitValues();
                         });
                       }),
@@ -140,7 +160,7 @@ class _HomeState extends State<Home> {
                     Expanded(
                       child: _textContainer("Input Alphabet (∑):", "0, 1, ...", (value) {
                         setState(() {
-                          _inputAlphabet = _appendInputToList(_inputAlphabet, value);
+                          _inputAlphabet = _appendInputToList(value);
                           _updateToggleFieldInitValues();
                         });
                       }),
@@ -153,7 +173,7 @@ class _HomeState extends State<Home> {
                     Expanded(
                       child: _textContainer("Output Alphabet (∆):", "a, b, ...", (value) {
                         setState(() {
-                          _outputAlphabet = _appendInputToList(_outputAlphabet, value);
+                          _outputAlphabet = _appendInputToList(value);
                           _updateToggleFieldInitValues();
                         });
                       }),
@@ -187,11 +207,13 @@ class _HomeState extends State<Home> {
                 SizedBox(height: _textContainerSpacing),
 
                 _textContainer(
-                    "Input String:",
-                    "e.g., 'abba'",
-                        (value) {
-
-                    }
+                  "Input String:",
+                  "e.g., 'abba'",
+                  (value) {
+                    setState(() {
+                      _inputString = value;
+                    });
+                  }
                 ),
 
                 SizedBox(height: _textContainerSpacing),
@@ -200,10 +222,14 @@ class _HomeState extends State<Home> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      debugPrint("States: $_states");
-                      debugPrint("Input Alphabet: $_inputAlphabet");
-                      debugPrint("Output Alphabet: $_outputAlphabet");
-                      debugPrint("Start State: $_startState");
+                      _buildTransitionMap();
+
+                      final result = _transitionMap.simulate(_inputString, _startState, _transitionMap.map);
+
+                      setState(() {
+                        _outputString = result.output;
+                        _visitedStates = result.visitedStates;
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF4F46E5), // button color
@@ -255,7 +281,12 @@ class _HomeState extends State<Home> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text("states visited", style: TextStyle(color: Color(0xFF4F46E5)),),
+                      Text(
+                        _visitedStates.join(" → "),
+                        style: TextStyle(
+                            color: Color(0xFF4F46E5)
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: 5),
@@ -268,7 +299,12 @@ class _HomeState extends State<Home> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text("sample output", style: TextStyle(color: Color(0xFF4F46E5)),),
+                      Text(
+                        _outputString,
+                        style: TextStyle(
+                            color: Color(0xFF4F46E5)
+                        )
+                      ),
                     ],
                   )
                 ],
@@ -280,6 +316,38 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+  }
+
+  void _buildTransitionMap() {
+    final newMap = <String, Map<String, Map<String, String>>>{};
+
+    for (var row in _transitionRows) {
+      final from = row.fromState.initValue;
+      final input = row.withInput.initValue;
+      final to = row.toState.initValue;
+      final output = row.withOutput.initValue;
+
+      if (!newMap.containsKey(from)) {
+        newMap[from] = {};
+      }
+
+      newMap[from]![input] = {
+        "nextState": to,
+        "output": output,
+      };
+    }
+
+    setState(() {
+      _transitionMap.map = newMap;
+    });
+  }
+
+  List<String> _appendInputToList(String value) {
+    return value
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
   }
 
   Widget _textContainer(String title, String hint, ValueChanged<String> onChanged) {
@@ -335,9 +403,5 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
-  }
-
-  List<String> _appendInputToList(List<String> list, String value) {
-    return list = value.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
   }
 }
