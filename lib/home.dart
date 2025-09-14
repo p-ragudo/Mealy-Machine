@@ -114,204 +114,262 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       backgroundColor: Color(0xFFF3F7FF),
-      body: Padding(
-        padding: MediaQuery.of(context).size.width >= 800
-            ? MediaQuery.of(context).size.width > 1300
-              ? EdgeInsets.symmetric(horizontal: screenWidth * 0.25, vertical: 30)
-              : EdgeInsets.symmetric(horizontal: screenWidth * 0.1, vertical: 30)
-            : const EdgeInsets.all(30),
-        child: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(30),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ]
-            ),
-            child: Column(
-              children: [
-                Text(
-                  "Mealy Machine Simulator",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth >= 1300
+                ? screenWidth * 0.25   // large desktop
+                : screenWidth >= 800
+                ? screenWidth * 0.03  // medium screens / small desktops
+                : screenWidth * 0.02, // phones
+            vertical: screenWidth >= 800 ? 30 : 20, // slightly smaller vertical padding for phones
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(screenWidth >= 800 ? 30 : 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ]
                 ),
-
-                SizedBox(height: 25),
-
-                Row(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: _textContainer("States (Q):", "q0, q1, ...", (value) {
-                        setState(() {
-                          _states = _appendInputToList(value);
-                          _updateToggleFieldInitValues();
-                        });
-                      }),
+                    SizedBox(height: 10),
+                    Text(
+                      "Mealy Machine Simulator",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    SizedBox(width: _textContainerSpacing),
-                    Expanded(
-                      child: _textContainer("Input Alphabet (∑):", "0, 1, ...", (value) {
-                        setState(() {
-                          _inputAlphabet = _appendInputToList(value);
-                          _updateToggleFieldInitValues();
-                        });
-                      }),
+
+                    Text(
+                      "by Group 7",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
                     ),
+
+                    SizedBox(height: 35),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _textContainer("States (Q):", "q0, q1, ...", (value) {
+                            setState(() {
+                              _states = _appendInputToList(value);
+                              _updateToggleFieldInitValues();
+                            });
+                          }),
+                        ),
+                        SizedBox(width: _textContainerSpacing),
+                        Expanded(
+                          child: _textContainer("Input Alphabet (∑):", "0, 1, ...", (value) {
+                            setState(() {
+                              _inputAlphabet = _appendInputToList(value);
+                              _updateToggleFieldInitValues();
+                            });
+                          }),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: _textContainerSpacing),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _textContainer("Output Alphabet (O):", "a, b, ...", (value) {
+                            setState(() {
+                              _outputAlphabet = _appendInputToList(value);
+                              _updateToggleFieldInitValues();
+                            });
+                          }),
+                        ),
+                        SizedBox(width: _textContainerSpacing),
+                        Expanded(
+                          child: _textContainer("Start State (q0):", "e.g. q0", (value) {
+                            setState(() {
+                              _startState = value;
+                              _updateToggleFieldInitValues();
+                            });
+                          }),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: _textContainerSpacing),
+
+                    TransitionWindow(
+                      transitionRows: _transitionRows,
+                      toggleFieldInitValue: _toggleFieldInitValues ?? TransitionRowDataContainer(
+                        fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                        withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                        toState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                        withOutput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                      ),
+                      onDeleteRow: _deleteRow,
+                      onAddTransition: _addTransition,
+                    ),
+
+                    SizedBox(height: _textContainerSpacing),
+
+                    _textContainer(
+                        "Input String:",
+                        "e.g., 'abba'",
+                            (value) {
+                          setState(() {
+                            _inputString = value;
+                          });
+                        }
+                    ),
+
+                    SizedBox(height: _textContainerSpacing),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _buildTransitionMap();
+
+                          final result = _transitionMap.simulate(_inputString, _startState, _transitionMap.map);
+
+                          setState(() {
+                            _outputString = result.output;
+                            _visitedStates = result.visitedStates;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF4F46E5), // button color
+                          foregroundColor: Colors.white, // text color
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5), // rounded corners
+                          ),
+                          elevation: 0, // <-- removes shadow
+                          shadowColor: Colors.transparent, // extra safety
+                        ),
+                        child: const Text(
+                          "Simulate",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: _textContainerSpacing),
+
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: const Color(0xFFBFDBFE),
+                          width: 1, // stroke thickness
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Simulation Results",
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Visited States:         ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  _visitedStates.join(" → "),
+                                  style: TextStyle(
+                                      color: Color(0xFF4F46E5)
+                                  ),
+                                  softWrap: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Output Produced:    ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  _outputString,
+                                  style: TextStyle(
+                                    color: Color(0xFF4F46E5)
+                                  ),
+                                  softWrap: true,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: 20),
                   ],
                 ),
-                SizedBox(height: _textContainerSpacing),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _textContainer("Output Alphabet (∆):", "a, b, ...", (value) {
-                        setState(() {
-                          _outputAlphabet = _appendInputToList(value);
-                          _updateToggleFieldInitValues();
-                        });
-                      }),
-                    ),
-                    SizedBox(width: _textContainerSpacing),
-                    Expanded(
-                      child: _textContainer("Start State (q0):", "e.g. q0", (value) {
-                        setState(() {
-                          _startState = value;
-                          _updateToggleFieldInitValues();
-                        });
-                      }),
-                    ),
-                  ],
-                ),
+              ),
 
-                SizedBox(height: _textContainerSpacing),
+              SizedBox(height: 50),
 
-                TransitionWindow(
-                  transitionRows: _transitionRows,
-                  toggleFieldInitValue: _toggleFieldInitValues ?? TransitionRowDataContainer(
-                    fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
-                    withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
-                    toState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
-                    withOutput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
-                  ),
-                  onDeleteRow: _deleteRow,
-                  onAddTransition: _addTransition,
-                ),
-
-                SizedBox(height: _textContainerSpacing),
-
-                _textContainer(
-                  "Input String:",
-                  "e.g., 'abba'",
-                  (value) {
-                    setState(() {
-                      _inputString = value;
-                    });
-                  }
-                ),
-
-                SizedBox(height: _textContainerSpacing),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _buildTransitionMap();
-
-                      final result = _transitionMap.simulate(_inputString, _startState, _transitionMap.map);
-
-                      setState(() {
-                        _outputString = result.output;
-                        _visitedStates = result.visitedStates;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4F46E5), // button color
-                      foregroundColor: Colors.white, // text color
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5), // rounded corners
-                      ),
-                      elevation: 0, // <-- removes shadow
-                      shadowColor: Colors.transparent, // extra safety
-                    ),
-                    child: const Text(
-                      "Simulate",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: _textContainerSpacing),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFFBFDBFE),
-                  width: 1, // stroke thickness
+              Text(
+                "Aringo, Althea Trisha Mae",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Simulation Results",
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold
-                    ),
-                  ),
-                  SizedBox(height: 17),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Visited States:    ",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        _visitedStates.join(" → "),
-                        style: TextStyle(
-                            color: Color(0xFF4F46E5)
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Output Produced:    ",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        _outputString,
-                        style: TextStyle(
-                            color: Color(0xFF4F46E5)
-                        )
-                      ),
-                    ],
-                  )
-                ],
+              Text(
+                "Deleña, Kenjie Aeron",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
               ),
-            ),
-              ],
-            ),
+              Text(
+                "De Leon, Roselle Jean",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+              ),
+              Text(
+                "Ragudo, Paolo",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
           ),
         ),
       ),
