@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mealy_machine/transition_toggle_field_data_container.dart';
 import 'transition_window.dart';
 import 'transition_row_data_container.dart';
 import 'transition_map.dart';
+
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -14,13 +16,65 @@ class _HomeState extends State<Home> {
 
   static const double _textContainerSpacing = 20;
   final List<TransitionRowDataContainer> _transitionRows = [];
+  TransitionRowDataContainer? _toggleFieldInitValues;
 
-  final List<String> _states = [];
-  final List<String> _inputAlphabet = [];
-  final List<String> _outputAlphabet = [];
+  List<String> _states = [];
+  List<String> _inputAlphabet = [];
+  List<String> _outputAlphabet = [];
   String _startState = "";
 
-  final TransitionMap _map = TransitionMap();
+  TransitionMap _map = TransitionMap();
+
+  void _updateToggleFieldInitValues() {
+    _toggleFieldInitValues = TransitionRowDataContainer(
+      fromState: TransitionToggleFieldDataContainer(
+        initValue: _states.isNotEmpty ? _states.first : "",
+        options: _states,
+        onChanged: (val) {},
+      ),
+      withInput: TransitionToggleFieldDataContainer(
+        initValue: _inputAlphabet.isNotEmpty ? _inputAlphabet.first : "",
+        options: _inputAlphabet,
+        onChanged: (val) {},
+      ),
+      toState: TransitionToggleFieldDataContainer(
+        initValue: _states.isNotEmpty ? _states.first : "",
+        options: _states,
+        onChanged: (val) {},
+      ),
+      withOutput: TransitionToggleFieldDataContainer(
+        initValue: _outputAlphabet.isNotEmpty ? _outputAlphabet.first : "",
+        options: _outputAlphabet,
+        onChanged: (val) {},
+      ),
+    );
+  }
+
+  void _addTransition() {
+    setState(() {
+      _updateToggleFieldInitValues(); // refresh options from current state/alphabet
+      _transitionRows.add(
+        TransitionRowDataContainer(
+          fromState: TransitionToggleFieldDataContainer(
+              initValue: _toggleFieldInitValues!.fromState.initValue,
+              options: _states,
+              onChanged: (val) {}),
+          withInput: TransitionToggleFieldDataContainer(
+              initValue: _toggleFieldInitValues!.withInput.initValue,
+              options: _inputAlphabet,
+              onChanged: (val) {}),
+          toState: TransitionToggleFieldDataContainer(
+              initValue: _toggleFieldInitValues!.toState.initValue,
+              options: _states,
+              onChanged: (val) {}),
+          withOutput: TransitionToggleFieldDataContainer(
+              initValue: _toggleFieldInitValues!.withOutput.initValue,
+              options: _outputAlphabet,
+              onChanged: (val) {}),
+        ),
+      );
+    });
+  }
 
   void _deleteRow(int index) {
     setState(() {
@@ -28,10 +82,10 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void _addTransition() {
-    setState(() {
-
-    });
+  @override
+  void initState() {
+    super.initState();
+    _updateToggleFieldInitValues();
   }
 
   @override
@@ -76,13 +130,19 @@ class _HomeState extends State<Home> {
                   children: [
                     Expanded(
                       child: _textContainer("States (Q):", "q1, q2, ...", (value) {
-
+                        setState(() {
+                          _states = _appendInputToList(_states, value);
+                          _updateToggleFieldInitValues();
+                        });
                       }),
                     ),
                     SizedBox(width: _textContainerSpacing),
                     Expanded(
                       child: _textContainer("Input Alphabet (∑):", "a, b, ...", (value) {
-                        _states.add(value);
+                        setState(() {
+                          _inputAlphabet = _appendInputToList(_inputAlphabet, value);
+                          _updateToggleFieldInitValues();
+                        });
                       }),
                     ),
                   ],
@@ -92,13 +152,19 @@ class _HomeState extends State<Home> {
                   children: [
                     Expanded(
                       child: _textContainer("Output Alphabet (∆):", "0, 1, ...", (value) {
-
+                        setState(() {
+                          _outputAlphabet = _appendInputToList(_outputAlphabet, value);
+                          _updateToggleFieldInitValues();
+                        });
                       }),
                     ),
                     SizedBox(width: _textContainerSpacing),
                     Expanded(
                       child: _textContainer("Start State (q0):", "e.g. S0", (value) {
-
+                        setState(() {
+                          _startState = value;
+                          _updateToggleFieldInitValues();
+                        });
                       }),
                     ),
                   ],
@@ -107,7 +173,20 @@ class _HomeState extends State<Home> {
                 SizedBox(height: _textContainerSpacing),
 
                 TransitionWindow(
-                  transitionRows: _transitionRows,
+                  transitionRows: _transitionRows.isEmpty
+                      ? [TransitionRowDataContainer(
+                    fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                    withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                    toState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                    withOutput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                  )]
+                      : _transitionRows,
+                  toggleFieldInitValue: _toggleFieldInitValues ?? TransitionRowDataContainer(
+                    fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                    withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                    toState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                    withOutput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
+                  ),
                   onDeleteRow: _deleteRow,
                   onAddTransition: _addTransition,
                 ),
@@ -128,7 +207,10 @@ class _HomeState extends State<Home> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-
+                      debugPrint("States: $_states");
+                      debugPrint("Input Alphabet: $_inputAlphabet");
+                      debugPrint("Output Alphabet: $_outputAlphabet");
+                      debugPrint("Start State: $_startState");
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF4F46E5), // button color
@@ -254,10 +336,15 @@ class _HomeState extends State<Home> {
                   borderSide: BorderSide.none,
                 ),
               ),
+              onChanged: onChanged,
             ),
           ),
         ],
       ),
     );
+  }
+
+  List<String> _appendInputToList(List<String> list, String value) {
+    return list = value.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
   }
 }

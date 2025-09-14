@@ -4,12 +4,14 @@ import 'transition_toggle_field_data_container.dart';
 
 class TransitionWindow extends StatefulWidget {
   final List<TransitionRowDataContainer> transitionRows;
+  final TransitionRowDataContainer toggleFieldInitValue;
   final void Function(int index) onDeleteRow;
   final void Function() onAddTransition;
 
   const TransitionWindow({
     super.key,
     required this.transitionRows,
+    required this.toggleFieldInitValue,
     required this.onDeleteRow,
     required this.onAddTransition,
   });
@@ -20,11 +22,13 @@ class TransitionWindow extends StatefulWidget {
 
 class _TransitionWindowState extends State<TransitionWindow> {
   late List<TransitionRowDataContainer> _transitionRows;
+  late TransitionRowDataContainer _toggleFieldInitValue;
 
   @override
   void initState() {
     super.initState();
     _transitionRows = widget.transitionRows;
+    _toggleFieldInitValue = widget.toggleFieldInitValue;
   }
 
   @override
@@ -52,10 +56,14 @@ class _TransitionWindowState extends State<TransitionWindow> {
             // starting default empty row
             _transitionRow(
               data: TransitionRowDataContainer(
-                fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
-                withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
-                toState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
-                withOutput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
+                fromState: TransitionToggleFieldDataContainer(
+                    initValue: "", options: [], onChanged: (value) {}),
+                withInput: TransitionToggleFieldDataContainer(
+                    initValue: "", options: [], onChanged: (value) {}),
+                toState: TransitionToggleFieldDataContainer(
+                    initValue: "", options: [], onChanged: (value) {}),
+                withOutput: TransitionToggleFieldDataContainer(
+                    initValue: "", options: [], onChanged: (value) {}),
               ),
               index: -1,
             ),
