@@ -5,11 +5,13 @@ import 'transition_toggle_field_data_container.dart';
 class TransitionWindow extends StatefulWidget {
   final List<TransitionRowDataContainer> transitionRows;
   final void Function(int index) onDeleteRow;
+  final void Function() onAddTransition;
 
   const TransitionWindow({
     super.key,
     required this.transitionRows,
     required this.onDeleteRow,
+    required this.onAddTransition,
   });
 
   @override
@@ -39,27 +41,60 @@ class _TransitionWindowState extends State<TransitionWindow> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: _transitionRows.isEmpty
-          ? [
-              // starting default empty row
-              _transitionRow(
-                data: TransitionRowDataContainer(
-                  fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
-                  withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
-                  toState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
-                  withOutput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
-                ),
-                index: -1,
+        children: [
+          Text(
+            "Transitions (∂ and ℷ)",
+            style: TextStyle(fontSize: 14),
+          ),
+          SizedBox(height: 12),
+          ...(_transitionRows.isEmpty
+              ? [
+            // starting default empty row
+            _transitionRow(
+              data: TransitionRowDataContainer(
+                fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
+                withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
+                toState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
+                withOutput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (value) {}),
               ),
-            ]
-          : _transitionRows.asMap().entries.map((entry) {
+              index: -1,
+            ),
+          ]
+              : _transitionRows.asMap().entries.map((entry) {
             final index = entry.key;
             final rowData = entry.value;
             return Padding(
               padding: const EdgeInsets.only(bottom: 15),
               child: _transitionRow(data: rowData, index: index),
             );
-          }).toList(),
+          }).toList()),
+
+          SizedBox(height: 15),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: widget.onAddTransition,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF6366F1).withValues(alpha: 0.10),
+                foregroundColor: Color(0xFF6366F1),
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(
+                    color: Color(0xFF6366F1)
+                  ),
+                ),
+                elevation: 0, // <-- removes shadow
+                shadowColor: Colors.transparent, // extra safety
+              ),
+              child: const Text(
+                "Add Transition",
+                style: TextStyle(fontSize: 13),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

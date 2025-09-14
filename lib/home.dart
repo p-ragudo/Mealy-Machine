@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'transition_window.dart';
 import 'transition_row_data_container.dart';
+import 'transition_map.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,24 +13,24 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   static const double _textContainerSpacing = 20;
-  final List<TransitionRowDataContainer> _transitionRows = [
-    // TransitionRowDataContainer(
-    //   fromState: TransitionToggleFieldDataContainer(initValue: "q0", options: ["q0", "q1"], onChanged: (value) {}),
-    //   withInput: TransitionToggleFieldDataContainer(initValue: "0", options: ["0", "1"], onChanged: (value) {}),
-    //   toState: TransitionToggleFieldDataContainer(initValue: "q1", options: ["q0", "q1"], onChanged: (value) {}),
-    //   withOutput: TransitionToggleFieldDataContainer(initValue: "1", options: ["0", "1"], onChanged: (value) {})
-    // ),
-    // TransitionRowDataContainer(
-    //     fromState: TransitionToggleFieldDataContainer(initValue: "q1", options: ["q0", "q1"], onChanged: (value) {}),
-    //     withInput: TransitionToggleFieldDataContainer(initValue: "0", options: ["0", "1"], onChanged: (value) {}),
-    //     toState: TransitionToggleFieldDataContainer(initValue: "q1", options: ["q0", "q1"], onChanged: (value) {}),
-    //     withOutput: TransitionToggleFieldDataContainer(initValue: "1", options: ["0", "1"], onChanged: (value) {})
-    // ),
-  ];
+  final List<TransitionRowDataContainer> _transitionRows = [];
+
+  final List<String> _states = [];
+  final List<String> _inputAlphabet = [];
+  final List<String> _outputAlphabet = [];
+  String _startState = "";
+
+  final TransitionMap _map = TransitionMap();
 
   void _deleteRow(int index) {
     setState(() {
       _transitionRows.removeAt(index);
+    });
+  }
+
+  void _addTransition() {
+    setState(() {
+
     });
   }
 
@@ -81,7 +82,7 @@ class _HomeState extends State<Home> {
                     SizedBox(width: _textContainerSpacing),
                     Expanded(
                       child: _textContainer("Input Alphabet (∑):", "a, b, ...", (value) {
-
+                        _states.add(value);
                       }),
                     ),
                   ],
@@ -108,6 +109,7 @@ class _HomeState extends State<Home> {
                 TransitionWindow(
                   transitionRows: _transitionRows,
                   onDeleteRow: _deleteRow,
+                  onAddTransition: _addTransition,
                 ),
 
                 SizedBox(height: _textContainerSpacing),
@@ -131,7 +133,7 @@ class _HomeState extends State<Home> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF4F46E5), // button color
                       foregroundColor: Colors.white, // text color
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 20),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5), // rounded corners
                       ),
@@ -173,12 +175,12 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Visited States: ",
+                        "Visited States:    ",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text("states visited"),
+                      Text("states visited", style: TextStyle(color: Color(0xFF4F46E5)),),
                     ],
                   ),
                   SizedBox(height: 5),
@@ -186,12 +188,12 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Output Produced: ",
+                        "Output Produced:    ",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text("sample output"),
+                      Text("sample output", style: TextStyle(color: Color(0xFF4F46E5)),),
                     ],
                   )
                 ],
