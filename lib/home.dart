@@ -35,82 +35,177 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Color(0xFFF3F7FF),
       body: Padding(
-        padding: const EdgeInsets.all(30),
-        child: Container(
-          padding: const EdgeInsets.all(30),
-          constraints: const BoxConstraints.expand(),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ]
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Mealy Machine Simulator",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+        padding: MediaQuery.of(context).size.width >= 800
+            ? MediaQuery.of(context).size.width > 1300
+              ? EdgeInsets.symmetric(horizontal: screenWidth * 0.25, vertical: 30)
+              : EdgeInsets.symmetric(horizontal: screenWidth * 0.1, vertical: 30)
+            : const EdgeInsets.all(30),
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(30),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ]
+            ),
+            child: Column(
+              children: [
+                Text(
+                  "Mealy Machine Simulator",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                SizedBox(height: 25),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: _textContainer("States (Q):", "q1, q2, ...", (value) {
+
+                      }),
+                    ),
+                    SizedBox(width: _textContainerSpacing),
+                    Expanded(
+                      child: _textContainer("Input Alphabet (∑):", "a, b, ...", (value) {
+
+                      }),
+                    ),
+                  ],
+                ),
+                SizedBox(height: _textContainerSpacing),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _textContainer("Output Alphabet (∆):", "0, 1, ...", (value) {
+
+                      }),
+                    ),
+                    SizedBox(width: _textContainerSpacing),
+                    Expanded(
+                      child: _textContainer("Start State (q0):", "e.g. S0", (value) {
+
+                      }),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: _textContainerSpacing),
+
+                TransitionWindow(
+                  transitionRows: _transitionRows,
+                  onDeleteRow: _deleteRow,
+                ),
+
+                SizedBox(height: _textContainerSpacing),
+
+                _textContainer(
+                    "Input String:",
+                    "e.g., 'abba'",
+                        (value) {
+
+                    }
+                ),
+
+                SizedBox(height: _textContainerSpacing),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF4F46E5), // button color
+                      foregroundColor: Colors.white, // text color
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5), // rounded corners
+                      ),
+                      elevation: 0, // <-- removes shadow
+                      shadowColor: Colors.transparent, // extra safety
+                    ),
+                    child: const Text(
+                      "Simulate",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: _textContainerSpacing),
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF6FF),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color(0xFFBFDBFE),
+                  width: 1, // stroke thickness
                 ),
               ),
-
-              SizedBox(height: 25),
-
-              Row(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: textContainer("States (Q):", "q1, q2, ...", (value) {
-
-                    }),
+                  Text(
+                    "Simulation Results",
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold
+                    ),
                   ),
-                  SizedBox(width: _textContainerSpacing),
-                  Expanded(
-                    child: textContainer("Input Alphabet (∑):", "a, b, ...", (value) {
-
-                    }),
+                  SizedBox(height: 17),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Visited States: ",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text("states visited"),
+                    ],
                   ),
+                  SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Output Produced: ",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text("sample output"),
+                    ],
+                  )
                 ],
               ),
-              SizedBox(height: _textContainerSpacing),
-              Row(
-                children: [
-                  Expanded(
-                    child: textContainer("Output Alphabet (∆):", "0, 1, ...", (value) {
-
-                    }),
-                  ),
-                  SizedBox(width: _textContainerSpacing),
-                  Expanded(
-                    child: textContainer("Start State (q0):", "e.g. S0", (value) {
-
-                    }),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: _textContainerSpacing),
-
-              TransitionWindow(
-                transitionRows: _transitionRows,
-                onDeleteRow: _deleteRow,
-              ),
-            ],
+            ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget textContainer(String title, String hint, ValueChanged<String> onChanged) {
+  Widget _textContainer(String title, String hint, ValueChanged<String> onChanged) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
