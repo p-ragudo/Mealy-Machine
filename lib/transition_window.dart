@@ -51,23 +51,9 @@ class _TransitionWindowState extends State<TransitionWindow> {
             style: TextStyle(fontSize: 14),
           ),
           SizedBox(height: 12),
-          ...(_transitionRows.isEmpty
-              ? [
-            // starting default empty row
-            _transitionRow(
-              data: TransitionRowDataContainer(
-                fromState: TransitionToggleFieldDataContainer(
-                    initValue: "", options: [], onChanged: (value) {}),
-                withInput: TransitionToggleFieldDataContainer(
-                    initValue: "", options: [], onChanged: (value) {}),
-                toState: TransitionToggleFieldDataContainer(
-                    initValue: "", options: [], onChanged: (value) {}),
-                withOutput: TransitionToggleFieldDataContainer(
-                    initValue: "", options: [], onChanged: (value) {}),
-              ),
-              index: -1,
-            ),
-          ]
+          ...(
+              _transitionRows.isEmpty
+              ? []
               : _transitionRows.asMap().entries.map((entry) {
             final index = entry.key;
             final rowData = entry.value;
@@ -75,7 +61,8 @@ class _TransitionWindowState extends State<TransitionWindow> {
               padding: const EdgeInsets.only(bottom: 15),
               child: _transitionRow(data: rowData, index: index),
             );
-          }).toList()),
+          }).toList()
+          ),
 
           SizedBox(height: 15),
 

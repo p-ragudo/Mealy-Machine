@@ -138,7 +138,7 @@ class _HomeState extends State<Home> {
                     ),
                     SizedBox(width: _textContainerSpacing),
                     Expanded(
-                      child: _textContainer("Input Alphabet (∑):", "a, b, ...", (value) {
+                      child: _textContainer("Input Alphabet (∑):", "0, 1, ...", (value) {
                         setState(() {
                           _inputAlphabet = _appendInputToList(_inputAlphabet, value);
                           _updateToggleFieldInitValues();
@@ -151,7 +151,7 @@ class _HomeState extends State<Home> {
                 Row(
                   children: [
                     Expanded(
-                      child: _textContainer("Output Alphabet (∆):", "0, 1, ...", (value) {
+                      child: _textContainer("Output Alphabet (∆):", "a, b, ...", (value) {
                         setState(() {
                           _outputAlphabet = _appendInputToList(_outputAlphabet, value);
                           _updateToggleFieldInitValues();
@@ -160,7 +160,7 @@ class _HomeState extends State<Home> {
                     ),
                     SizedBox(width: _textContainerSpacing),
                     Expanded(
-                      child: _textContainer("Start State (q0):", "e.g. S0", (value) {
+                      child: _textContainer("Start State (q0):", "e.g. q0", (value) {
                         setState(() {
                           _startState = value;
                           _updateToggleFieldInitValues();
@@ -173,14 +173,7 @@ class _HomeState extends State<Home> {
                 SizedBox(height: _textContainerSpacing),
 
                 TransitionWindow(
-                  transitionRows: _transitionRows.isEmpty
-                      ? [TransitionRowDataContainer(
-                    fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
-                    withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
-                    toState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
-                    withOutput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
-                  )]
-                      : _transitionRows,
+                  transitionRows: _transitionRows,
                   toggleFieldInitValue: _toggleFieldInitValues ?? TransitionRowDataContainer(
                     fromState: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
                     withInput: TransitionToggleFieldDataContainer(initValue: "", options: [], onChanged: (val) {}),
