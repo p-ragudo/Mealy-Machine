@@ -14,9 +14,9 @@ class TransitionMap {
       Map<String,
           String> currentInputInMap = currentStateInMap[currentInputChar]!;
 
-      statesVisited.add(currentState);
       output.write(currentInputInMap["output"]!);
       currentState = currentInputInMap["nextState"]!;
+      statesVisited.add(currentState);
     }
 
     SimulationResult result = SimulationResult(
