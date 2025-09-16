@@ -1,16 +1,5 @@
 class TransitionMap {
-  Map<String, Map<String, Map<String, String>>> map = {
-    "q0":
-    {
-      "a": {"nextState": "q1", "output": "1"},
-      "b": {"nextState": "q0", "output": "0"}
-    },
-    "q1":
-    {
-      "a": {"nextState": "q1", "output": "1"},
-      "b": {"nextState": "q0", "output": "0"}
-    }
-  };
+  Map<String, Map<String, Map<String, String>>> map = {};
 
   SimulationResult simulate(String text, String initialState, Map<String, Map<String, Map<String, String>>> transitions) {
     List<String> input = text.split('');
