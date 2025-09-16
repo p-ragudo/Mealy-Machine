@@ -1,12 +1,23 @@
 class TransitionMap {
-  Map<String, Map<String, Map<String, String>>> map = {};
+  Map<String, Map<String, Map<String, String>>> map = {
+    "q0":
+    {
+      "a": {"nextState": "q1", "output": "1"},
+      "b": {"nextState": "q0", "output": "0"}
+    },
+    "q1":
+    {
+      "a": {"nextState": "q1", "output": "1"},
+      "b": {"nextState": "q0", "output": "0"}
+    }
+  };
 
   SimulationResult simulate(String text, String initialState, Map<String, Map<String, Map<String, String>>> transitions) {
     List<String> input = text.split('');
     StringBuffer output = StringBuffer();
     String currentState = initialState;
 
-    List<String> statesVisited = [initialState];
+    List<String> statesVisited = [];
 
     for (String currentInputChar in input) {
       Map<String,
@@ -34,3 +45,4 @@ class SimulationResult {
 
   SimulationResult({required this.output, required this.visitedStates});
 }
+
